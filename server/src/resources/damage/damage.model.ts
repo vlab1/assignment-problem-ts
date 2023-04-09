@@ -21,6 +21,10 @@ export default class DamageModel extends sequelize.Model<Damage, Optional<Damage
     @sequelize.AllowNull(false)
     @sequelize.Column(sequelize.DataType.INTEGER)
     C!: number
+
+    @sequelize.AllowNull
+	@sequelize.Column(sequelize.DataType.BOOLEAN)
+	x?: boolean
     
 	@sequelize.AllowNull
 	@sequelize.CreatedAt

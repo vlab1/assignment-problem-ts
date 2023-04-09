@@ -39,12 +39,28 @@ class AnalysisController implements Controller {
         next: NextFunction
     ): Promise<Response | void> => {
         try {
-            const { columns, rows, data } = req.body;
+            const {
+                columns,
+                rows,
+                data,
+                columns_N,
+                columns_S,
+                columns_y,
+                rows_H,
+                rows_L,
+                rows_z,
+            } = req.body;
 
             const analysis = await this.AnalysisService.analysis(
                 columns,
                 rows,
-                data
+                data,
+                columns_N,
+                columns_S,
+                columns_y,
+                rows_H,
+                rows_L,
+                rows_z
             );
 
             res.status(201).json({ data: analysis });
@@ -59,12 +75,26 @@ class AnalysisController implements Controller {
         next: NextFunction
     ): Promise<Response | void> => {
         try {
-            const { columns, rows, data } = req.body;
+            const {        columns,
+                rows,
+                data,
+                columns_N,
+                columns_S,
+                columns_y,
+                rows_H,
+                rows_L,
+                rows_z } = req.body;
 
             const analysis = await this.AnalysisService.save(
                 columns,
                 rows,
-                data
+                data,
+                columns_N,
+                columns_S,
+                columns_y,
+                rows_H,
+                rows_L,
+                rows_z
             );
 
             res.status(201).json({ data: analysis });

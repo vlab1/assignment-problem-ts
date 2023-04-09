@@ -24,6 +24,14 @@
     background-color: transparent;
     border: transparent;
   }
+  caption {
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 10px;
+  }
 }
 
 .table-analysis {
@@ -47,6 +55,14 @@
     font-size: 20px;
     color: rgb(0, 0, 0);
     border: 1px solid rgb(56, 56, 56);
+  }
+  caption {
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 10px;
   }
 }
 

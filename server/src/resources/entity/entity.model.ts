@@ -20,6 +20,14 @@ export default class EntityModel extends sequelize.Model<Entity, Optional<Entity
 	@sequelize.Column(sequelize.DataType.BOOLEAN)
 	y?: boolean
 
+	@sequelize.AllowNull(false)
+    @sequelize.Column(sequelize.DataType.INTEGER)
+    S!: number
+
+	@sequelize.AllowNull(false)
+    @sequelize.Column(sequelize.DataType.INTEGER)
+    N!: number
+
 	@sequelize.HasMany(() => DamageModel, {
 		onUpdate: "CASCADE",
 		onDelete: "CASCADE",

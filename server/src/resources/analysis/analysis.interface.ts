@@ -2,11 +2,15 @@
     columns: Array<string>;
     rows: Array<string>;
     data: Array<Array<number>>;
+    columns_N: Array<number>;
+    columns_S: Array<number>;
+    columns_y: Array<number>;
+    rows_H: Array<number>;
+    rows_L: Array<Array<number>>;
+    rows_z: Array<number>;
 }
 
 interface Point {
-    // row: string;
-    // column: string;
     row: number;
     column: number;
     data: number;
@@ -17,4 +21,9 @@ interface Assignment {
     result: Point[];
 }
 
-export {Analysis, Point, Assignment}
+interface DownloadData {
+    assignment: Assignment,
+    data: Array<Array<string>>
+}
+
+export {Analysis, Point, Assignment, DownloadData}

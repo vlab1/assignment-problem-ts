@@ -20,6 +20,14 @@ export default class PointModel extends sequelize.Model<Point, Optional<Point, '
 	@sequelize.Column(sequelize.DataType.BOOLEAN)
 	z?: boolean
 
+	@sequelize.AllowNull(false)
+    @sequelize.Column(sequelize.DataType.INTEGER)
+    H!: number
+
+	@sequelize.AllowNull(false)
+    @sequelize.Column(sequelize.DataType.ARRAY(sequelize.DataType.INTEGER))
+    L!: Array<number>
+
 	@sequelize.HasMany(() => DamageModel  , {
 		onUpdate: "CASCADE",
 		onDelete: "CASCADE",
