@@ -363,7 +363,7 @@ const Main = () => {
                   }
                 >
                   <input
-                    disabled={rowIndex === 0 && columnIndex === 0}
+                    disabled={(rowIndex === 0 && columnIndex === 0) || rowIndex === columnCount + 1 || columnIndex === rowCount + 1}
                     type="text"
                     value={cell}
                     onChange={(event) =>
