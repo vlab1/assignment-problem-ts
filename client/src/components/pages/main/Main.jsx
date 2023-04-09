@@ -347,7 +347,7 @@ const Main = () => {
           </button>
         </div>
       </div>
-      <table className="table-input">
+      {data && data.length > 0 && <table className="table-input">
         <caption>Data</caption>
         <tbody>
           {data.map((row, rowIndex) => (
@@ -375,7 +375,7 @@ const Main = () => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table>}
       <div
         style={loading ? { display: "block" } : { display: "none" }}
         className="loader"
