@@ -51,23 +51,44 @@ function lookBestOption(dataObj: Analysis): Assignment {
     }
     let L = JSON.parse(JSON.stringify(dataObj.rows_L));
     let N = JSON.parse(JSON.stringify(dataObj.columns_N));
-    for (let i = 0; i < L.length; i++) {
-        L[i] = [...new Set(L[i])];
-    }
-    L = L.flat();
-    const countL = L.reduce((acc: any, val: any) => {
-        acc[val] = acc[val] ? acc[val] + 1 : 1;
-        return acc;
-    }, {});
-    const countN = N.reduce((acc: any, val: any) => {
-        acc[val] = acc[val] ? acc[val] + 1 : 1;
-        return acc;
-    }, {});
-    for (let key in countN) {
-        if (key in countL && countN[key] > countL[key]) {
-            bool = true;
+
+    //
+    function findIndex(L: Array<Array<number>>, n: number) {
+        for (let i = 0; i < L.length; i++) {
+            if (L[i].includes(n)) {
+                return i;
+            }
         }
+        return -1; // если N не найден в L
     }
+
+    N.forEach((item: number, i: number) => {
+        const index = findIndex(L, item);
+        if (index > -1) {
+            L.splice(index, 1);
+        }
+    });
+    if (L.length > 0) {
+        bool = true;
+    }
+    //
+    // for (let i = 0; i < L.length; i++) {
+    //     L[i] = [...new Set(L[i])];
+    // }
+    // L = L.flat();
+    // const countL = L.reduce((acc: any, val: any) => {
+    //     acc[val] = acc[val] ? acc[val] + 1 : 1;
+    //     return acc;
+    // }, {});
+    // const countN = N.reduce((acc: any, val: any) => {
+    //     acc[val] = acc[val] ? acc[val] + 1 : 1;
+    //     return acc;
+    // }, {});
+    // for (let key in countN) {
+    //     if (key in countL && countN[key] > countL[key]) {
+    //         bool = true;
+    //     }
+    // }
     if (bool) {
         throw new Error('Problem has no solution');
     }
