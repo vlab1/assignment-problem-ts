@@ -88,7 +88,11 @@ const Main = () => {
         ...saveData,
       })
         .then((res) => {
-          setAnalysisData(res.data);
+          if (res.data.result.length === 0 && res.data.maxTotalDamage === 0 ) {
+            setAnalysisData({ error: true });
+          } else {
+            setAnalysisData(res.data);
+          }
         })
         .catch(() => {
           setAnalysisData({ error: true });
@@ -296,6 +300,8 @@ const Main = () => {
             value={columnCount}
             onChange={handleColumnCountChange}
             placeholder="Matrix size"
+            type="number"
+            max={10}
           ></input>
         </div>
 
@@ -353,7 +359,7 @@ const Main = () => {
           {data.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {row.map((cell, columnIndex) => (
-                <td
+                <td 
                   key={columnIndex}
                   style={
                     (rowIndex === 0 || columnIndex === 0) &&
