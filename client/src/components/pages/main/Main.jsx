@@ -8,6 +8,7 @@ const Main = () => {
   const [rowCount, setRowCount] = useState(null);
   const { loading, request } = useHttp();
   const [analysisData, setAnalysisData] = useState({});
+  const [visibility, serVisibility] = useState(false);
 
   function transformData(table, startRow, endRow, startCol, endCol) {
     const columns = table[0].slice(startCol - 1, endCol);
@@ -88,11 +89,7 @@ const Main = () => {
         ...saveData,
       })
         .then((res) => {
-          if (res.data.result.length === 0 && res.data.maxTotalDamage === 0 ) {
-            setAnalysisData({ error: true });
-          } else {
-            setAnalysisData(res.data);
-          }
+          setAnalysisData(res.data);
         })
         .catch(() => {
           setAnalysisData({ error: true });
@@ -117,6 +114,7 @@ const Main = () => {
     try {
       setData([]);
       setAnalysisData({});
+      serVisibility(false)
     } catch (e) {
       throw new Error("Error");
     }
@@ -178,6 +176,10 @@ const Main = () => {
   const handleCreateTable = () => {
     const newData = [];
     const topRow = [""];
+    if(columnCount > 11 || rowCount> 11){
+      alert("Размер матрицы должен быть не больше 10")
+    }
+    else{
     for (let i = 0; i < columnCount + 3; i++) {
       topRow.push("");
     }
@@ -191,6 +193,8 @@ const Main = () => {
     }
     setData(newData);
     setAnalysisData({});
+    serVisibility(true);
+  }
   };
 
   const handleCellChange = (event, rowIndex, columnIndex) => {
@@ -206,97 +210,103 @@ const Main = () => {
   const handleGenerateData = () => {
     const newData = [];
     const topRow = [""];
-    for (let i = 0; i < columnCount; i++) {
-      topRow.push("Point " + (i + 1));
+    if(columnCount > 11 || rowCount> 11){
+      alert("Размер матрицы должен быть не больше 10")
     }
-    newData.push(topRow);
-    for (let i = 0; i < rowCount; i++) {
-      const newRow = ["Entity " + (i + 1)];
-
-      for (let j = 0; j < columnCount; j++) {
-        newRow.push(randomIntFromInterval(1, 25) + "");
+    else{
+      for (let i = 0; i < columnCount; i++) {
+        topRow.push("Point " + (i + 1));
       }
-      newData.push(newRow);
-    }
-
-    for (let i = 0; i < newData.length; i++) {
-      if (i === 0) {
-        newData[i].push("y");
-      } else {
-        newData[i].push("1");
-      }
-      if (i + 1 === newData.length) {
-        let array = [];
-        for (let j = 0; j < newData[i].length; j++) {
-          if (j === 0) {
-            array.push("z");
-          } else if (j !== newData[i].length - 1) {
-            array.push("1");
-          }
+      newData.push(topRow);
+      for (let i = 0; i < rowCount; i++) {
+        const newRow = ["Entity " + (i + 1)];
+  
+        for (let j = 0; j < columnCount; j++) {
+          newRow.push(randomIntFromInterval(1, 25) + "");
         }
-        newData.push(array);
-        break;
+        newData.push(newRow);
       }
-    }
-    for (let i = 0; i < newData.length; i++) {
-      if (i === 0) {
-        newData[i].push("S");
-      } else {
-        newData[i].push(randomIntFromInterval(500, 950) + "");
-      }
-      if (i + 2 === newData.length) {
-        let array = [];
-        for (let j = 0; j < newData[i].length; j++) {
-          if (j === 0) {
-            array.push("H");
-          } else if (
-            j !== newData[i].length - 1 &&
-            j !== newData[i].length - 2
-          ) {
-            array.push(randomIntFromInterval(900, 1000) + "");
-          }
+  
+      for (let i = 0; i < newData.length; i++) {
+        if (i === 0) {
+          newData[i].push("y");
+        } else {
+          newData[i].push("1");
         }
-        newData.push(array);
-        break;
-      }
-    }
-    for (let i = 0; i < newData.length; i++) {
-      if (i === 0) {
-        newData[i].push("N");
-      } else {
-        newData[i].push(randomIntFromInterval(1, 4) + "");
-      }
-      if (i + 3 === newData.length) {
-        let array = [];
-        for (let j = 0; j < newData[i].length; j++) {
-          if (j === 0) {
-            array.push("L");
-          } else if (
-            j !== newData[i].length - 1 &&
-            j !== newData[i].length - 2 &&
-            j !== newData[i].length - 3
-          ) {
-            array.push(
-              `[${randomIntFromInterval(1, 4)}, ${randomIntFromInterval(
-                1,
-                4
-              )}, ${randomIntFromInterval(1, 4)}]`
-            );
+        if (i + 1 === newData.length) {
+          let array = [];
+          for (let j = 0; j < newData[i].length; j++) {
+            if (j === 0) {
+              array.push("z");
+            } else if (j !== newData[i].length - 1) {
+              array.push("1");
+            }
           }
+          newData.push(array);
+          break;
         }
-        newData.push(array);
-        break;
       }
+      for (let i = 0; i < newData.length; i++) {
+        if (i === 0) {
+          newData[i].push("S");
+        } else {
+          newData[i].push(randomIntFromInterval(500, 950) + "");
+        }
+        if (i + 2 === newData.length) {
+          let array = [];
+          for (let j = 0; j < newData[i].length; j++) {
+            if (j === 0) {
+              array.push("H");
+            } else if (
+              j !== newData[i].length - 1 &&
+              j !== newData[i].length - 2
+            ) {
+              array.push(randomIntFromInterval(900, 1000) + "");
+            }
+          }
+          newData.push(array);
+          break;
+        }
+      }
+      for (let i = 0; i < newData.length; i++) {
+        if (i === 0) {
+          newData[i].push("N");
+        } else {
+          newData[i].push(randomIntFromInterval(1, 4) + "");
+        }
+        if (i + 3 === newData.length) {
+          let array = [];
+          for (let j = 0; j < newData[i].length; j++) {
+            if (j === 0) {
+              array.push("L");
+            } else if (
+              j !== newData[i].length - 1 &&
+              j !== newData[i].length - 2 &&
+              j !== newData[i].length - 3
+            ) {
+              array.push(
+                `[${randomIntFromInterval(1, 4)}, ${randomIntFromInterval(
+                  1,
+                  4
+                )}, ${randomIntFromInterval(1, 4)}]`
+              );
+            }
+          }
+          newData.push(array);
+          break;
+        }
     }
-    setData(newData);
-    setAnalysisData({});
+      setData(newData);
+      setAnalysisData({});
+      serVisibility(true);
+    }
   };
 
   return (
     <div>
       <div className="menu">
         <div className="field">
-          <input
+        <input
             value={columnCount}
             onChange={handleColumnCountChange}
             placeholder="Matrix size"
@@ -353,13 +363,13 @@ const Main = () => {
           </button>
         </div>
       </div>
-      {data && data.length > 0 && <table className="table-input">
-        <caption>Data</caption>
+      <table className="table-input">
+        {visibility ? <caption>Data</caption> : null}
         <tbody>
           {data.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {row.map((cell, columnIndex) => (
-                <td 
+                <td
                   key={columnIndex}
                   style={
                     (rowIndex === 0 || columnIndex === 0) &&
@@ -381,7 +391,7 @@ const Main = () => {
             </tr>
           ))}
         </tbody>
-      </table>}
+      </table>
       <div
         style={loading ? { display: "block" } : { display: "none" }}
         className="loader"
