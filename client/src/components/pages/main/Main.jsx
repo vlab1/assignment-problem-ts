@@ -176,8 +176,8 @@ const Main = () => {
   const handleCreateTable = () => {
     const newData = [];
     const topRow = [""];
-    if(columnCount > 11 || rowCount> 11){
-      alert("Размер матрицы должен быть не больше 10")
+    if(columnCount > 10 || rowCount> 10){
+      alert("The size of the matrix must not exceed 10")
     }
     else{
     for (let i = 0; i < columnCount + 3; i++) {
