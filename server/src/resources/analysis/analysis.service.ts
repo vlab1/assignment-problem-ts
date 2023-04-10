@@ -5,7 +5,7 @@ import {
     Analysis,
     Assignment,
     Point,
-    DownloadData
+    DownloadData,
 } from '@/resources/analysis/analysis.interface';
 import { lookBestOption } from '@/utils/algorithms/hungarian.algorithm';
 import fs from 'fs';
@@ -63,7 +63,10 @@ class AnalysisService {
     //     return { maxTotalDamage, result: bestAssignment };
     // }
 
-    // private saveObjectToFile(filePath: string, objectToSave: Array<Assignment>): void {
+    // private saveObjectToFile(
+    //     filePath: string,
+    //     objectToSave: Array<Assignment>
+    // ): void {
     //     const jsonString = JSON.stringify(objectToSave);
 
     //     fs.writeFile(filePath, jsonString, (err) => {
@@ -115,18 +118,20 @@ class AnalysisService {
     //             rowSums.every((sum) => sum > 0) &&
     //             colSums.every((sum) => sum > 0);
     //         if (isFeasible && totalDamage > maxTotalDamage) {
-    //             allOptions.push({ maxTotalDamage: totalDamage, result: assignment });
+    //             allOptions.push({
+    //                 maxTotalDamage: totalDamage,
+    //                 result: assignment,
+    //             });
     //         }
     //     }
     //     function sortDamageResults(damageResults: any): any {
     //         return damageResults.sort(
-    //             (a: any, b: any) => b.totalDamage - a.totalDamage
+    //             (a: any, b: any) => b.maxTotalDamage - a.maxTotalDamage
     //         );
     //     }
     //     allOptions = sortDamageResults(allOptions);
     //     return allOptions;
     // }
-
 
     private async dbFilling(data: Analysis): Promise<void | Error> {
         try {
@@ -167,7 +172,12 @@ class AnalysisService {
                     entity_id: entities_ids[entity_column],
                     point_id: points_ids[point_row],
                     C: item,
-                    x: analysis.result.filter((item) => item.column === entity_column && item.row === point_row).length > 0
+                    x:
+                        analysis.result.filter(
+                            (item) =>
+                                item.column === entity_column &&
+                                item.row === point_row
+                        ).length > 0,
                 }))
             );
             await this.damage.bulkCreate(damage);
@@ -288,42 +298,48 @@ class AnalysisService {
                     (a: any, b: any) => a.entity_id - b.entity_id
                 );
             }
-            let array1 = [["z"], ["H"], ["L"]];
+            let array1 = [['z'], ['H'], ['L']];
             let result = [] as Array<Array<string>>;
-            const assignment = {maxTotalDamage: 0, result: []} as Assignment;
+            const assignment = { maxTotalDamage: 0, result: [] } as Assignment;
             for (let i = 0; i < entitiesData.length + 1; i++) {
                 let array = [];
                 if (i === 0) {
                     array.push('');
                     for (let k = 0; k < pointsData.length; k++) {
                         array.push(pointsData[k].name_B);
-                        array1[0].push(pointsData[k].z === true ? "1" : "0");
-                        array1[1].push(pointsData[k].H +  "");
-                        array1[2].push("[" + pointsData[k].L.join(", ") + "]");
+                        array1[0].push(pointsData[k].z === true ? '1' : '0');
+                        array1[1].push(pointsData[k].H + '');
+                        array1[2].push('[' + pointsData[k].L.join(', ') + ']');
                     }
-                    array.push("y");
-                    array.push("S");
-                    array.push("N");
+                    array.push('y');
+                    array.push('S');
+                    array.push('N');
                     result.push(array);
                 } else {
                     array.push(entitiesData[i - 1].name_A);
                     for (let m = 0; m < damageArray.length; m++) {
                         array.push(damageArray[i - 1][m].C + '');
                         if (damageArray[i - 1][m].x === true) {
-                            assignment.result.push({row: i - 1, column: m, data: Number(damageArray[i - 1][m].C)})
-                            assignment.maxTotalDamage += Number(damageArray[i - 1][m].C);
+                            assignment.result.push({
+                                row: i - 1,
+                                column: m,
+                                data: Number(damageArray[i - 1][m].C),
+                            });
+                            assignment.maxTotalDamage += Number(
+                                damageArray[i - 1][m].C
+                            );
                         }
                     }
-                    array.push(entitiesData[i - 1].y === true ? "1" : "0");
-                    array.push(entitiesData[i - 1].S +  "");
-                    array.push(entitiesData[i - 1].N +  "");
+                    array.push(entitiesData[i - 1].y === true ? '1' : '0');
+                    array.push(entitiesData[i - 1].S + '');
+                    array.push(entitiesData[i - 1].N + '');
                     result.push(array);
                 }
             }
             for (let i = 0; i < array1.length; i++) {
                 result.push(array1[i]);
             }
-            return {assignment, data: result};
+            return { assignment, data: result };
         } catch (error: any) {
             throw new Error(error.message);
         }
