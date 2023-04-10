@@ -61,14 +61,40 @@ function lookBestOption(dataObj: Analysis): Assignment {
         }
         return -1; // если N не найден в L
     }
+    function permute(nums: Array<number>) {
+        const result = [] as any;
 
-    N.forEach((item: number, i: number) => {
-        const index = findIndex(L, item);
-        if (index > -1) {
-            L.splice(index, 1);
+        function dfs(current: any, remaining: any) {
+            if (remaining.length === 0) {
+                result.push(current);
+                return;
+            }
+
+            for (let i = 0; i < remaining.length; i++) {
+                dfs(
+                    current.concat(remaining[i]),
+                    remaining.slice(0, i).concat(remaining.slice(i + 1))
+                );
+            }
         }
+
+        dfs([], nums);
+
+        return result;
+    }
+    const permutations = permute(N);
+    const answers = [] as Array<number>;
+    permutations.forEach((array: Array<number>, i: number) => {
+        let L1 = JSON.parse(JSON.stringify(dataObj.rows_L));
+        array.forEach((item: number, j: number) => {
+            const index = findIndex(L1, item);
+            if (index > -1) {
+                L1.splice(index, 1);
+            }
+        });
+        answers.push(L1.length);
     });
-    if (L.length > 0) {
+    if (!answers.includes(0)) {
         bool = true;
     }
     //
