@@ -8,7 +8,6 @@ const Main = () => {
   const [rowCount, setRowCount] = useState(null);
   const { loading, request } = useHttp();
   const [analysisData, setAnalysisData] = useState({});
-  const [visibility, serVisibility] = useState(false);
 
   function transformData(table, startRow, endRow, startCol, endCol) {
     const columns = table[0].slice(startCol - 1, endCol);
@@ -102,8 +101,11 @@ const Main = () => {
   const handleDownloadData = async () => {
     try {
       await request("/api/analysis/find").then((res) => {
-        setData(res.data.data);
-        setAnalysisData(res.data.assignment);
+        console.log(res.data.data.flat());
+        if (res.data.data.flat().length > 7) {
+          setData(res.data.data);
+          setAnalysisData(res.data.assignment);
+        }
       });
     } catch (e) {
       throw new Error("Error");
@@ -114,7 +116,6 @@ const Main = () => {
     try {
       setData([]);
       setAnalysisData({});
-      serVisibility(false);
     } catch (e) {
       throw new Error("Error");
     }
@@ -175,8 +176,15 @@ const Main = () => {
   const handleCreateTable = () => {
     const newData = [];
     const topRow = [""];
-    if (columnCount > 8 || rowCount > 8) {
-      alert("The size of the matrix must not exceed 8");
+    if (
+      columnCount > 8 ||
+      rowCount > 8 ||
+      columnCount < 1 ||
+      rowCount < 1 ||
+      isNaN(columnCount) ||
+      isNaN(rowCount)
+    ) {
+      alert("The size of the matrix must be a number between 0 and 8.");
     } else {
       for (let i = 0; i < columnCount + 3; i++) {
         topRow.push("");
@@ -191,7 +199,6 @@ const Main = () => {
       }
       setData(newData);
       setAnalysisData({});
-      serVisibility(true);
     }
   };
 
@@ -208,8 +215,15 @@ const Main = () => {
   const handleGenerateData = () => {
     const newData = [];
     const topRow = [""];
-    if (columnCount > 8 || rowCount > 8) {
-      alert("The size of the matrix must not exceed 8");
+    if (
+      columnCount > 8 ||
+      rowCount > 8 ||
+      columnCount < 1 ||
+      rowCount < 1 ||
+      isNaN(columnCount) ||
+      isNaN(rowCount)
+    ) {
+      alert("The size of the matrix must be a number between 0 and 8.");
     } else {
       for (let i = 0; i < columnCount; i++) {
         topRow.push("Point " + (i + 1));
@@ -295,7 +309,6 @@ const Main = () => {
       }
       setData(newData);
       setAnalysisData({});
-      serVisibility(true);
     }
   };
 
@@ -307,8 +320,6 @@ const Main = () => {
             value={columnCount}
             onChange={handleColumnCountChange}
             placeholder="Matrix size"
-            type="number"
-            max={10}
           ></input>
         </div>
 
@@ -360,39 +371,41 @@ const Main = () => {
           </button>
         </div>
       </div>
-      {visibility && <table className="table-input">
-         <caption>Data</caption> 
-        <tbody>
-          {data.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {row.map((cell, columnIndex) => (
-                <td
-                  key={columnIndex}
-                  style={
-                    (rowIndex === 0 || columnIndex === 0) &&
-                    !(rowIndex === 0 && columnIndex === 0)
-                      ? { background: "#efefef" }
-                      : { background: "white" }
-                  }
-                >
-                  <input
-                    disabled={
-                      (rowIndex === 0 && columnIndex === 0) ||
-                      rowIndex === columnCount + 1 ||
-                      columnIndex === rowCount + 1
+      {data.length > 0 && (
+        <table className="table-input">
+          <caption>Data</caption>
+          <tbody>
+            {data.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {row.map((cell, columnIndex) => (
+                  <td
+                    key={columnIndex}
+                    style={
+                      (rowIndex === 0 || columnIndex === 0) &&
+                      !(rowIndex === 0 && columnIndex === 0)
+                        ? { background: "#efefef" }
+                        : { background: "white" }
                     }
-                    type="text"
-                    value={cell}
-                    onChange={(event) =>
-                      handleCellChange(event, rowIndex, columnIndex)
-                    }
-                  />
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>}
+                  >
+                    <input
+                      disabled={
+                        (rowIndex === 0 && columnIndex === 0) ||
+                        rowIndex === columnCount + 1 ||
+                        columnIndex === rowCount + 1
+                      }
+                      type="text"
+                      value={cell}
+                      onChange={(event) =>
+                        handleCellChange(event, rowIndex, columnIndex)
+                      }
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       <div
         style={loading ? { display: "block" } : { display: "none" }}
         className="loader"

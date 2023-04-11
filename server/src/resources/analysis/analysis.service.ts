@@ -9,6 +9,7 @@ import {
     MyError,
 } from '@/resources/analysis/analysis.interface';
 import fs from 'fs';
+import myCache from '@/utils/cache/cache'
 
 class AnalysisService {
     private damage = DamageModel;
@@ -185,6 +186,20 @@ class AnalysisService {
         rows_z: Array<number>
     ): Promise<Assignment | Error | MyError> {
         try {
+            const analysisKey = JSON.stringify({
+                columns,
+                rows,
+                data,
+                columns_N,
+                columns_S,
+                columns_y,
+                rows_H,
+                rows_L,
+                rows_z,
+            });
+            if (myCache.has(analysisKey)) {
+                return myCache.get(analysisKey);
+            }
             const analysis = this.lookBestOption({
                 columns,
                 rows,
@@ -196,6 +211,7 @@ class AnalysisService {
                 rows_L,
                 rows_z,
             });
+            myCache.set(analysisKey, analysis);
             return analysis;
         } catch (error: any) {
             throw new Error(error.message);
@@ -279,7 +295,7 @@ class AnalysisService {
             }
             damageArray.sort((a: any, b: any) => a[0].point_id - b[0].point_id);
             pointsData.sort((a: any, b: any) => a.point_id - b.point_id);
-            entitiesData.sort((a: any, b: any) => a.entity_id - b.entity_id);
+            entitiesData.sort((a: any, b: any) => a.entity_id - b.entity_id);            
             for (let i = 0; i < damageArray.length; i++) {
                 damageArray[i].sort(
                     (a: any, b: any) => a.entity_id - b.entity_id
