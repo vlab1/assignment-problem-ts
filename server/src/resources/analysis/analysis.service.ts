@@ -6,14 +6,114 @@ import {
     Assignment,
     Point,
     DownloadData,
+    MyError,
 } from '@/resources/analysis/analysis.interface';
-import { lookBestOption } from '@/utils/algorithms/hungarian.algorithm';
 import fs from 'fs';
 
 class AnalysisService {
     private damage = DamageModel;
     private entity = EntityModel;
     private point = PointModel;
+
+    private lookBestOption(dataObj: Analysis): Assignment | Error | MyError {
+        try {
+            const numRows = dataObj.data.length;
+            const numCols = dataObj.data[0].length;
+            let maxTotalDamage = 0;
+            let bestAssignment: Point[] = [];
+            const permute = () => {
+                const stack: { i: number; assignment: Point[] }[] = [];
+                stack.push({
+                    i: 0,
+                    assignment: Array(numRows).fill({
+                        row: '',
+                        column: '',
+                        data: 0,
+                    }),
+                });
+                while (stack.length > 0) {
+                    const { i, assignment } = stack.pop()!;
+                    if (i === numRows) {
+                        const option = [...assignment];
+                        const rowSums = Array(numRows).fill(0);
+                        const colSums = Array(numCols).fill(0);
+                        let totalDamage = 0;
+                        let volumeCondition = true;
+                        let classCondition = true;
+                        let placementCondition = false;
+                        for (const point of option) {
+                            const { row, column, data } = point;
+                            rowSums[row] += data;
+                            colSums[column] -= -data;
+                            totalDamage += data;
+                        }
+                        for (let j = 0; j < option.length; j++) {
+                            const point = option[j];
+                            if (
+                                dataObj.columns_S[point.row] >
+                                dataObj.rows_H[point.column]
+                            ) {
+                                volumeCondition = false;
+                                break;
+                            }
+                            if (
+                                !dataObj.rows_L[point.column].includes(
+                                    dataObj.columns_N[point.row]
+                                )
+                            ) {
+                                classCondition = false;
+                                break;
+                            }
+                        }
+                        placementCondition =
+                            rowSums.every((sum) => sum > 0) &&
+                            colSums.every((sum) => sum > 0);
+
+                        if (
+                            placementCondition &&
+                            volumeCondition &&
+                            classCondition &&
+                            totalDamage > maxTotalDamage
+                        ) {
+                            maxTotalDamage = totalDamage;
+                            bestAssignment = option;
+                        }
+                    } else {
+                        for (let j = 0; j < numCols; j++) {
+                            assignment[i] = {
+                                row: i,
+                                column: j,
+                                data: dataObj.data[i][j],
+                            };
+                            stack.push({
+                                i: i + 1,
+                                assignment: [...assignment],
+                            });
+                        }
+                    }
+                }
+            };
+            permute();
+            if (maxTotalDamage === 0 && bestAssignment.length === 0) {
+                return { error: true };
+            }
+            return { maxTotalDamage, result: bestAssignment };
+        } catch (error: any) {
+            throw new Error(error.message);
+        }
+    }
+
+    private saveObjectToFile(filePath: string, objectToSave: any): void {
+        const jsonString = JSON.stringify(objectToSave);
+
+        fs.writeFile(filePath, jsonString, (err) => {
+            if (err) {
+                console.error(`Error writing file ${filePath}: `, err);
+                return;
+            }
+            console.log(`Object saved to ${filePath}`);
+        });
+    }
 
     private async dbFilling(data: Analysis): Promise<void | Error> {
         try {
@@ -47,8 +147,13 @@ class AnalysisService {
             );
             points_ids.sort((a: any, b: any) => a - b);
             entities_ids.sort((a: any, b: any) => a - b);
-            const analysis = lookBestOption(data);
-
+            const analysis = this.lookBestOption(data);
+            if (analysis instanceof Error) {
+                throw new Error('Error');
+            }
+            if ('error' in analysis) {
+                throw new Error('Error');
+            }
             const damage = data.data.flatMap((array, point_row) =>
                 array.map((item, entity_column) => ({
                     entity_id: entities_ids[entity_column],
@@ -78,9 +183,9 @@ class AnalysisService {
         rows_H: Array<number>,
         rows_L: Array<Array<number>>,
         rows_z: Array<number>
-    ): Promise<Assignment | Error> {
+    ): Promise<Assignment | Error | MyError> {
         try {
-            const analysis = lookBestOption({
+            const analysis = this.lookBestOption({
                 columns,
                 rows,
                 data,

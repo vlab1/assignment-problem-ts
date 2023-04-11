@@ -16,6 +16,10 @@ interface Point {
     data: number;
 }
 
+interface MyError {
+    error: boolean;
+}
+
 interface Assignment {
     maxTotalDamage: number;
     result: Point[];
@@ -26,4 +30,4 @@ interface DownloadData {
     data: Array<Array<string>>
 }
 
-export {Analysis, Point, Assignment, DownloadData}
+export {Analysis, Point, Assignment, DownloadData, MyError}

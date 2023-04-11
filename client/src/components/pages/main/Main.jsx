@@ -114,7 +114,7 @@ const Main = () => {
     try {
       setData([]);
       setAnalysisData({});
-      serVisibility(false)
+      serVisibility(false);
     } catch (e) {
       throw new Error("Error");
     }
@@ -168,7 +168,6 @@ const Main = () => {
   };
 
   const handleColumnCountChange = (event) => {
-    console.log(data);
     setColumnCount(parseInt(event.target.value));
     setRowCount(parseInt(event.target.value));
   };
@@ -176,25 +175,24 @@ const Main = () => {
   const handleCreateTable = () => {
     const newData = [];
     const topRow = [""];
-    if(columnCount > 10 || rowCount> 10){
-      alert("The size of the matrix must not exceed 10")
-    }
-    else{
-    for (let i = 0; i < columnCount + 3; i++) {
-      topRow.push("");
-    }
-    newData.push(topRow);
-    for (let i = 0; i < rowCount + 3; i++) {
-      const newRow = [""];
-      for (let j = 0; j < columnCount + 3; j++) {
-        newRow.push("");
+    if (columnCount > 8 || rowCount > 8) {
+      alert("The size of the matrix must not exceed 8");
+    } else {
+      for (let i = 0; i < columnCount + 3; i++) {
+        topRow.push("");
       }
-      newData.push(newRow);
+      newData.push(topRow);
+      for (let i = 0; i < rowCount + 3; i++) {
+        const newRow = [""];
+        for (let j = 0; j < columnCount + 3; j++) {
+          newRow.push("");
+        }
+        newData.push(newRow);
+      }
+      setData(newData);
+      setAnalysisData({});
+      serVisibility(true);
     }
-    setData(newData);
-    setAnalysisData({});
-    serVisibility(true);
-  }
   };
 
   const handleCellChange = (event, rowIndex, columnIndex) => {
@@ -210,23 +208,22 @@ const Main = () => {
   const handleGenerateData = () => {
     const newData = [];
     const topRow = [""];
-    if(columnCount > 10 || rowCount> 10){
-      alert("The size of the matrix must not exceed 10")
-    }
-    else{
+    if (columnCount > 8 || rowCount > 8) {
+      alert("The size of the matrix must not exceed 8");
+    } else {
       for (let i = 0; i < columnCount; i++) {
         topRow.push("Point " + (i + 1));
       }
       newData.push(topRow);
       for (let i = 0; i < rowCount; i++) {
         const newRow = ["Entity " + (i + 1)];
-  
+
         for (let j = 0; j < columnCount; j++) {
           newRow.push(randomIntFromInterval(1, 25) + "");
         }
         newData.push(newRow);
       }
-  
+
       for (let i = 0; i < newData.length; i++) {
         if (i === 0) {
           newData[i].push("y");
@@ -295,7 +292,7 @@ const Main = () => {
           newData.push(array);
           break;
         }
-    }
+      }
       setData(newData);
       setAnalysisData({});
       serVisibility(true);
@@ -306,7 +303,7 @@ const Main = () => {
     <div>
       <div className="menu">
         <div className="field">
-        <input
+          <input
             value={columnCount}
             onChange={handleColumnCountChange}
             placeholder="Matrix size"
@@ -363,8 +360,8 @@ const Main = () => {
           </button>
         </div>
       </div>
-      <table className="table-input">
-        {visibility ? <caption>Data</caption> : null}
+      {visibility && <table className="table-input">
+         <caption>Data</caption> 
         <tbody>
           {data.map((row, rowIndex) => (
             <tr key={rowIndex}>
@@ -379,7 +376,11 @@ const Main = () => {
                   }
                 >
                   <input
-                    disabled={(rowIndex === 0 && columnIndex === 0) || rowIndex === columnCount + 1 || columnIndex === rowCount + 1}
+                    disabled={
+                      (rowIndex === 0 && columnIndex === 0) ||
+                      rowIndex === columnCount + 1 ||
+                      columnIndex === rowCount + 1
+                    }
                     type="text"
                     value={cell}
                     onChange={(event) =>
@@ -391,7 +392,7 @@ const Main = () => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table>}
       <div
         style={loading ? { display: "block" } : { display: "none" }}
         className="loader"
@@ -437,7 +438,7 @@ const Main = () => {
 
       {analysisData.error && (
         <table className="table-analysis">
-          <caption>No answers</caption>          
+          <caption>No answers</caption>
         </table>
       )}
     </div>

@@ -44,7 +44,6 @@
         "joi": "^17.8.4",
         "module-alias": "^2.2.2",
         "morgan": "^1.10.0",
-        "munkres-js": "^1.2.2",
         "pg": "^8.10.0",
         "sequelize": "^6.30.0",
         "sequelize-typescript": "^2.1.5"
