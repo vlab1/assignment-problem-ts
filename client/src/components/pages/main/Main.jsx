@@ -4,8 +4,8 @@ import "./Main.scss";
 
 const Main = () => {
   const [data, setData] = useState([]);
-  const [columnCount, setColumnCount] = useState(null);
-  const [rowCount, setRowCount] = useState(null);
+  const [columnCount, setColumnCount] = useState(3);
+  const [rowCount, setRowCount] = useState(3);
   const { loading, request } = useHttp();
   const [analysisData, setAnalysisData] = useState({});
 
@@ -295,12 +295,26 @@ const Main = () => {
               j !== newData[i].length - 2 &&
               j !== newData[i].length - 3
             ) {
-              array.push(
-                `[${randomIntFromInterval(1, 4)}, ${randomIntFromInterval(
-                  1,
-                  4
-                )}, ${randomIntFromInterval(1, 4)}]`
-              );
+              let item = JSON.stringify(
+                [
+                  ...new Set(
+                    JSON.parse(
+                      `[${randomIntFromInterval(1, 4)}, ${randomIntFromInterval(
+                        1,
+                        4
+                      )}, ${randomIntFromInterval(
+                        1,
+                        4
+                      )}, ${randomIntFromInterval(1, 4)}]`
+                    )
+                  ),
+                ],
+                null,
+                1
+              ).split("");
+              item.splice(1, 2);
+              item = item.join("");
+              array.push(item);
             }
           }
           newData.push(array);
@@ -449,9 +463,11 @@ const Main = () => {
         </table>
       )}
 
-      {analysisData.error && (
+      {(analysisData.error ||
+        (analysisData.maxTotalDamage === 0 &&
+          analysisData.result.length === 0)) && (
         <table className="table-analysis">
-          <caption>No answers</caption>
+          <caption>No answer</caption>
         </table>
       )}
     </div>

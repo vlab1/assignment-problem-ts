@@ -9,7 +9,7 @@ import {
     MyError,
 } from '@/resources/analysis/analysis.interface';
 import fs from 'fs';
-import myCache from '@/utils/cache/cache'
+import myCache from '@/utils/cache/cache';
 
 class AnalysisService {
     private damage = DamageModel;
@@ -149,26 +149,32 @@ class AnalysisService {
             points_ids.sort((a: any, b: any) => a - b);
             entities_ids.sort((a: any, b: any) => a - b);
             const analysis = this.lookBestOption(data);
-            if (analysis instanceof Error) {
-                throw new Error('Error');
+            if (analysis instanceof Error || 'error' in analysis) {
+                const damage = data.data.flatMap((array, point_row) =>
+                    array.map((item, entity_column) => ({
+                        entity_id: entities_ids[entity_column],
+                        point_id: points_ids[point_row],
+                        C: item,
+                        x: false,
+                    }))
+                );
+                await this.damage.bulkCreate(damage);
+            } else {
+                const damage = data.data.flatMap((array, point_row) =>
+                    array.map((item, entity_column) => ({
+                        entity_id: entities_ids[entity_column],
+                        point_id: points_ids[point_row],
+                        C: item,
+                        x:
+                            analysis.result.filter(
+                                (item) =>
+                                    item.column === entity_column &&
+                                    item.row === point_row
+                            ).length > 0,
+                    }))
+                );
+                await this.damage.bulkCreate(damage);
             }
-            if ('error' in analysis) {
-                throw new Error('Error');
-            }
-            const damage = data.data.flatMap((array, point_row) =>
-                array.map((item, entity_column) => ({
-                    entity_id: entities_ids[entity_column],
-                    point_id: points_ids[point_row],
-                    C: item,
-                    x:
-                        analysis.result.filter(
-                            (item) =>
-                                item.column === entity_column &&
-                                item.row === point_row
-                        ).length > 0,
-                }))
-            );
-            await this.damage.bulkCreate(damage);
         } catch (error: any) {
             throw new Error(error.message);
         }
@@ -295,7 +301,7 @@ class AnalysisService {
             }
             damageArray.sort((a: any, b: any) => a[0].point_id - b[0].point_id);
             pointsData.sort((a: any, b: any) => a.point_id - b.point_id);
-            entitiesData.sort((a: any, b: any) => a.entity_id - b.entity_id);            
+            entitiesData.sort((a: any, b: any) => a.entity_id - b.entity_id);
             for (let i = 0; i < damageArray.length; i++) {
                 damageArray[i].sort(
                     (a: any, b: any) => a.entity_id - b.entity_id
